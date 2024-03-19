@@ -87,7 +87,7 @@
         const isMobile = data.platform === "mobile";
 
         const AdSizesForBannerTop = () => {
-          if (isMobile) {
+          // if (isMobile) {
             return googletag
               .sizeMapping()
               .addSize([300, 0], [[300, 100]])
@@ -99,22 +99,20 @@
                 ]
               )
               .build();
-          }
+          // }
 
-          return googletag
-            .sizeMapping()
-            .addSize(
-              [1280, 0],
-              [
-                [1280, 100],
-                [1280, 150],
-              ]
-            )
-            .addSize([970, 0], [[970, 90]])
-            .addSize([728, 0], [[728, 90]])
-            .build();
-
-          return adSizes;
+          // return googletag
+          //   .sizeMapping()
+          //   .addSize(
+          //     [1280, 0],
+          //     [
+          //       [1280, 100],
+          //       [1280, 150],
+          //     ]
+          //   )
+          //   .addSize([970, 0], [[970, 90]])
+          //   .addSize([728, 0], [[728, 90]])
+          //   .build();
         };
 
         const AdSizesForBannerLeft = () => {
