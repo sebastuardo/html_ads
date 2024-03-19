@@ -207,11 +207,15 @@
         });
 
         googletag.pubads().addEventListener("slotRenderEnded", (event) => {
-          const bannerSizes = {
-            [`${data.bannerType}BannerSize`]: event.size,
-          };
-
-          window.parent.postMessage(bannerSizes, "*");
+          try {
+            const bannerSizes = {
+              [`${data.bannerType}BannerSize`]: event.size,
+            };
+  
+            window.parent.postMessage(bannerSizes, "*");
+          } catch (error) {
+            console.log("error: ", error)
+          }
         });
       }
     </script>
