@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPT Banners</title>
+    <script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+    <script>
+      function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+
+        const queryParams = {
+          slot: "",
+          subSection: "", // Ante ultima parte categoria
+          subJota: "",
+          siteSection: "", // Ultima parte categoria
+          store_in_store: "", //tienda,linio,tottus,sodimac,falabella
+          searchTerm: "",
+          pageName: "",
+          jota: "",
+          gcategory_d: "",
+          gcategory_a: "",
+          gcategory_b: "",
+          gcategory_c: "",
+          folder: "",
+          emailHash: "",
+          bannerType: "",
+          platform: "",
+        };
+
+        for (const [key, value] of params) {
+          queryParams[key] = value;
+        }
+
+        return queryParams;
+      }
+
+      function parseParams(queryParams) {
+        const data = {
+          ...queryParams,
+        };
+
+        try {
+          const { jCategory, gCategory } = queryParams;
+
+          if (jCategory) {
+            data.jota = jCategory.substring(0, 3);
+            data.subJota = jCategory.substring(0, 5);
+          }
+
+          if (gCategory) {
+            data.gcategory_a = gCategory.slice(0, 3);
+            data.gcategory_b = gCategory.slice(0, 5);
+            data.gcategory_c = gCategory.slice(0, 7);
+            data.gcategory_d = gCategory.slice(0, 9);
+          }
+
+          return data;
+        } catch (error) {
+          return data;
+        }
+      }
+
+      function getBannerConfig(banner) {
+        const queryParams = getQueryParams();
+        const data = parseParams(queryParams);
+
+        return {
+          id: data.slot,
+          folder: data.folder,
+          sizes: [
+            [300, 100],
+            [1280, 150],
+            [1280, 100],
+            [728, 90],
+            [970, 90],
+          ],
+          data,
+        };
+      }
+
+      function createContainer(data) {
+        window.document.body.innerHTML += `<div id="${data.slot}"></div>`;
+      }
+
+      const getAdSizes = (data, googletag) => {
+        const isMobile = data.platform === "mobile";
+
+        const AdSizesForBannerTop = () => {
+          if (isMobile) {
+            return googletag
+              .sizeMapping()
+              .addSize([300, 0], [[300, 100]])
+              .addSize(
+                [0, 0],
+                [
+                  [300, 100],
+                  [300, 250],
+                ]
+              )
+              .build();
+          }
+
+          return googletag
+            .sizeMapping()
+            .addSize(
+              [1280, 0],
+              [
+                [1280, 100],
+                [1280, 150],
+              ]
+            )
+            .addSize([970, 0], [[970, 90]])
+            .addSize([728, 0], [[728, 90]])
+            .build();
+
+          return adSizes;
+        };
+
+        const AdSizesForBannerLeft = () => {
+          var adSizes = googletag
+            .sizeMapping()
+            .addSize(
+              [300, 0],
+              [
+                [300, 600],
+                [300, 250],
+              ]
+            )
+            .addSize([250, 0], [[250, 250]])
+            .addSize([200, 0], [[200, 200]])
+            .addSize([160, 0], [[160, 600]])
+            .build();
+
+          return adSizes;
+        };
+
+        const AdSizesForBannerBottom = () => {
+          var adSizes = googletag
+            .sizeMapping()
+            .addSize([970, 0], [[970, 90]])
+            .addSize([728, 0], [[728, 90]])
+            .addSize([320, 0], [[320, 50]])
+            .addSize([300, 0], [[300, 250]])
+            .build();
+
+          return adSizes;
+        };
+
+        const adSizesFunctions = {
+          top: AdSizesForBannerTop,
+          left: AdSizesForBannerLeft,
+          bottom: AdSizesForBannerBottom,
+          default: () => {},
+        };
+
+        const currentAdSizeFunction =
+          adSizesFunctions[data.bannerType] || adSizesFunctions.default;
+
+        const adSize = currentAdSizeFunction();
+
+        return adSize;
+      };
+
+      function generateBanner(banner) {
+        // Example values
+        // const data = {
+        //   subSection: "",
+        //   subJota: "",
+        //   siteSection: "",
+        //   store_in_store: "falabella",
+        //   searchTerm: "",
+        //   pageName: "",
+        //   jota: "",
+        //   gcategory_d: "G180301",
+        //   gcategory_a: "G18",
+        //   gcategory_b: "G1803",
+        //   gcategory_c: "G180301",
+        //   slot: "/21632469435/PLP_Banner_Superior"
+        // };
+
+        const data = banner.data;
+
+        // Container should always match with bellow div in <body>
+        window.container = data.slot;
+
+        window.googletag = window.googletag || {
+          cmd: [],
+        };
+        googletag.cmd.push(function () {
+          const adSizes = getAdSizes(data, googletag);
+
+          googletag
+            .defineSlot(banner.folder, banner.sizes, banner.id)
+            .defineSizeMapping(adSizes)
+            .addService(googletag.pubads());
+
+          if (data.emailHash) {
+            googletag.pubads().setPublisherProvidedId(data.emailHash);
+          }
+          googletag.pubads().enableSingleRequest();
+          for (const key in data) {
+            googletag.pubads().setTargeting(key, data[key]);
+          }
+          googletag.pubads().collapseEmptyDivs(true);
+          googletag.enableServices();
+        });
+
+        googletag.pubads().addEventListener("slotRenderEnded", (event) => {
+          const bannerSizes = {
+            [`${data.bannerType}BannerSize`]: event.size,
+          };
+
+          window.parent.postMessage(bannerSizes, "*");
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <script>
+      var banner = getBannerConfig();
+      createContainer(banner.data);
+      generateBanner(banner);
+      googletag.cmd.push(function () {
+        googletag.display(window.container);
+      });
+    </script>
+  </body>
+</html>
