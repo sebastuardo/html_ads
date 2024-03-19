@@ -208,9 +208,13 @@
 
         googletag.pubads().addEventListener("slotRenderEnded", (event) => {
           try {
+            console.log("entre al slotRenderEnded");
+  
             const bannerSizes = {
               [`${data.bannerType}BannerSize`]: event.size,
             };
+            
+            console.log("event.size: ", event.size);
   
             window.parent.postMessage(bannerSizes, "*");
           } catch (error) {
