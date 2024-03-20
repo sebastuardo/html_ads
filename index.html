@@ -84,6 +84,11 @@
       }
 
       const getAdSizes = (data, googletag) => {
+        return googletag
+          .sizeMapping()
+          .addSize([300, 0], [[300, 100]])
+          .build();
+        
         const isMobile = data.platform === "mobile";
 
         const AdSizesForBannerTop = () => {
