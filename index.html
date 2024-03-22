@@ -83,17 +83,10 @@
         window.document.body.innerHTML += `<div id="${data.slot}"></div>`;
       }
 
-      const getAdSizes = (data, googletag) => {
-        return googletag
-          .sizeMapping()
-          .addSize([300, 0], [[300, 100]])
-          .build();
-        
+      function getAdSizes(data, googletag) {
         const isMobile = data.platform === "mobile";
 
-        const AdSizesForBannerTop = () => {
-          console.log("entre al top")
-
+        function AdSizesForBannerTop() {
           if (isMobile) {
             return googletag
               .sizeMapping()
@@ -113,9 +106,11 @@
             .addSize([970, 0], [[970, 90]])
             .addSize([728, 0], [[728, 90]])
             .build();
-        };
 
-        const AdSizesForBannerLeft = () => {
+          return adSizes;
+        }
+
+        function AdSizesForBannerLeft() {
           var adSizes = googletag
             .sizeMapping()
             .addSize(
@@ -131,9 +126,9 @@
             .build();
 
           return adSizes;
-        };
+        }
 
-        const AdSizesForBannerBottom = () => {
+        function AdSizesForBannerBottom() {
           var adSizes = googletag
             .sizeMapping()
             .addSize([970, 0], [[970, 90]])
@@ -143,15 +138,14 @@
             .build();
 
           return adSizes;
-        };
+        }
 
         const adSizesFunctions = {
           top: AdSizesForBannerTop,
           left: AdSizesForBannerLeft,
           bottom: AdSizesForBannerBottom,
-          default: () => {},
+          default: function () {},
         };
-        console.log("data.bannerType: ", data.bannerType)
 
         const currentAdSizeFunction =
           adSizesFunctions[data.bannerType] || adSizesFunctions.default;
@@ -159,7 +153,7 @@
         const adSize = currentAdSizeFunction();
 
         return adSize;
-      };
+      }
 
       function generateBanner(banner) {
         // Example values
@@ -180,15 +174,17 @@
 
         const data = banner.data;
 
+        console.log("banner: ", banner.sizes);
+
         // Container should always match with bellow div in <body>
         window.container = data.slot;
 
         window.googletag = window.googletag || {
           cmd: [],
         };
-        googletag.cmd.push(function () {
-          const adSizes = getAdSizes(data, googletag);
+        const adSizes = getAdSizes(data, googletag);
 
+        googletag.cmd.push(function () {
           googletag
             .defineSlot(banner.folder, banner.sizes, banner.id)
             .defineSizeMapping(adSizes)
@@ -206,19 +202,14 @@
         });
 
         googletag.pubads().addEventListener("slotRenderEnded", (event) => {
-          try {
-            console.log("entre al slotRenderEnded");
-  
-            const bannerSizes = {
-              [`${data.bannerType}BannerSize`]: event.size,
-            };
-            
-            console.log("event.size: ", event.size);
-  
-            window.parent.postMessage(bannerSizes, "*");
-          } catch (error) {
-            console.log("error: ", error)
-          }
+          console.log("entre al slotRenderEnded");
+
+          const bannerSizes = {
+            [`${data.bannerType}BannerSize`]: event.size,
+          };
+          console.log("event.size: ", event.size);
+
+          window.parent.postMessage(bannerSizes, "*");
         });
       }
     </script>
