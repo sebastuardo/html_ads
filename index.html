@@ -61,20 +61,54 @@
         }
       }
 
+      function getSizes(data) {
+        if (data.bannerType === "top" && data.platform === "mobile")
+          return [[300, 100]];
+
+        if (data.bannerType === "top")
+          return [
+            [1280, 100],
+            [1280, 150],
+            [970, 90],
+            [728, 90],
+          ];
+
+        if (data.bannerType === "left")
+          return [
+            [300, 600],
+            [300, 250],
+            [250, 250],
+            [200, 200],
+            [160, 600],
+          ];
+
+        if (data.bannerType === "bottom")
+          return [
+            [970, 90],
+            [728, 90],
+            [320, 50],
+            [300, 250],
+          ];
+
+        return [
+          [300, 100],
+          [1280, 150],
+          [1280, 100],
+          [728, 90],
+          [970, 90],
+        ];
+      }
+
       function getBannerConfig(banner) {
         const queryParams = getQueryParams();
         const data = parseParams(queryParams);
 
+        const sizes = getSizes(data);
+
         return {
           id: data.slot,
           folder: data.folder,
-          sizes: [
-            [300, 100],
-            [1280, 150],
-            [1280, 100],
-            [728, 90],
-            [970, 90],
-          ],
+          sizes,
           data,
         };
       }
