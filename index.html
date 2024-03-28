@@ -69,8 +69,6 @@
           return [
             [1280, 100],
             [1280, 150],
-            [970, 90],
-            [728, 90],
           ];
 
         if (data.bannerType === "left")
@@ -88,6 +86,7 @@
             [728, 90],
             [320, 50],
             [300, 250],
+            [300, 100],
           ];
 
         return [
@@ -128,18 +127,20 @@
               .build();
           }
 
-          return googletag
-            .sizeMapping()
-            .addSize(
-              [1280, 0],
-              [
-                [1280, 100],
-                [1280, 150],
-              ]
-            )
-            .addSize([970, 0], [[970, 90]])
-            .addSize([728, 0], [[728, 90]])
-            .build();
+          return (
+            googletag
+              .sizeMapping()
+              .addSize(
+                [1280, 0],
+                [
+                  [1280, 100],
+                  [1280, 150],
+                ]
+              )
+              // .addSize([970, 0], [[970, 90]])
+              // .addSize([728, 0], [[728, 90]])
+              .build()
+          );
 
           return adSizes;
         }
@@ -163,12 +164,19 @@
         }
 
         function AdSizesForBannerBottom() {
+          console.log("entree");
           var adSizes = googletag
             .sizeMapping()
             .addSize([970, 0], [[970, 90]])
             .addSize([728, 0], [[728, 90]])
             .addSize([320, 0], [[320, 50]])
-            .addSize([300, 0], [[300, 250]])
+            .addSize(
+              [300, 0],
+              [
+                [300, 250],
+                [300, 100],
+              ]
+            )
             .build();
 
           return adSizes;
@@ -208,8 +216,6 @@
 
         const data = banner.data;
 
-        console.log("banner: ", banner.sizes);
-
         // Container should always match with bellow div in <body>
         window.container = data.slot;
 
@@ -221,7 +227,7 @@
         googletag.cmd.push(function () {
           googletag
             .defineSlot(banner.folder, banner.sizes, banner.id)
-            .defineSizeMapping(adSizes)
+            // .defineSizeMapping(adSizes)
             .addService(googletag.pubads());
 
           if (data.emailHash) {
@@ -236,12 +242,9 @@
         });
 
         googletag.pubads().addEventListener("slotRenderEnded", (event) => {
-          console.log("entre al slotRenderEnded");
-
           const bannerSizes = {
             [`${data.bannerType}BannerSize`]: event.size,
           };
-          console.log("event.size: ", event.size);
 
           window.parent.postMessage(bannerSizes, "*");
         });
